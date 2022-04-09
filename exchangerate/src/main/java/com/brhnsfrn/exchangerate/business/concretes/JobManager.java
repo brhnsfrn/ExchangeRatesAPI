@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.brhnsfrn.exchangerate.business.abstracts.JobService;
 import com.brhnsfrn.exchangerate.core.reader.abstracts.ReaderSevice;
-import com.brhnsfrn.exchangerate.core.reader.concretes.TCMBReader;
 import com.brhnsfrn.exchangerate.core.utilities.result.Result;
 import com.brhnsfrn.exchangerate.dataAccess.abstracts.CurrencyDao;
 import com.brhnsfrn.exchangerate.dataAccess.abstracts.ExchangeRateDao;
@@ -23,30 +22,30 @@ public class JobManager implements JobService{
 	private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
 	private CurrencyDao currencyDao;
 	private ExchangeRateDao exchangeRateDao;
-	private ReaderSevice  tcmbReader;
+	private ReaderSevice tcmbReader;
 	
 	@Autowired
-	public JobManager(CurrencyDao currencyDao, ExchangeRateDao exchangeRateDao) {
+	public JobManager(CurrencyDao currencyDao, ExchangeRateDao exchangeRateDao, ReaderSevice tcmbReader) {
 		super();
 		this.currencyDao = currencyDao;
 		this.exchangeRateDao = exchangeRateDao;
-		this.tcmbReader = new TCMBReader();
+		this.tcmbReader = tcmbReader;
 	}
 
 
 	@Override
-	@Scheduled(cron = "${brhnsfrn.getterJob.cronExpression}")
+	@Scheduled(cron = "${job.cron.expression}", zone = "Europe/Istanbul")
 	public Result getData() {
 		LOG.info("--- job started ---");
 		List<ExchangeRate> listData = tcmbReader.getData();
 		for(ExchangeRate item : listData) {
-			if(this.currencyDao.isExists(item.getCurrencyCode())) {
-				item.setCurrency(this.currencyDao.getByCurrencyCode(item.getCurrencyCode()));
+			if(this.currencyDao.existsByCurrencyCodeIgnoreCase(item.getCode())) {
+				item.setCurrency(this.currencyDao.getByCurrencyCode(item.getCode()));
 			}
 			else {
 				Currency currency = new Currency();
-				currency.setCurrencyCode(item.getCurrencyCode());
-				currency.setCurrencyName(item.getCurrencyName());
+				currency.setCurrencyCode(item.getCode());
+				currency.setCurrencyName(item.getName());
 				item.setCurrency(this.currencyDao.save(currency));
 			}
 		}

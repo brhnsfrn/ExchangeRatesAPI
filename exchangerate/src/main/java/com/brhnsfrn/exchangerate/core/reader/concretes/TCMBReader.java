@@ -8,6 +8,8 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,7 +18,10 @@ import org.w3c.dom.NodeList;
 import com.brhnsfrn.exchangerate.core.reader.abstracts.ReaderSevice;
 import com.brhnsfrn.exchangerate.entities.concretes.ExchangeRate;
 
+@Service
 public class TCMBReader implements ReaderSevice{
+	@Value("${tcmb.service.url}")
+	private String serviceUrl;
 	
 	@Override
 	public List<ExchangeRate> getData() {
@@ -24,7 +29,7 @@ public class TCMBReader implements ReaderSevice{
 		try {
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			
-			URL url = new URL("https://www.tcmb.gov.tr/kurlar/today.xml");
+			URL url = new URL(serviceUrl);
 			Document document = builder.parse(url.openStream());
 			
 			NodeList currencyList = document.getElementsByTagName("Currency");
@@ -38,8 +43,8 @@ public class TCMBReader implements ReaderSevice{
 						continue;
 					}
 					ExchangeRate rateItem = new ExchangeRate();
-					rateItem.setCurrencyCode(element.getAttribute("CurrencyCode"));
-					rateItem.setCurrencyName(getElementValue(element, "Isim"));
+					rateItem.setCode(element.getAttribute("CurrencyCode"));
+					rateItem.setName(getElementValue(element, "Isim"));
 					rateItem.setBuying(getDecimal(getElementValue(element, "ForexBuying")));
 					rateItem.setSelling(getDecimal(getElementValue(element, "ForexSelling")));
 					rateItem.setBanknoteBuying(getDecimal(getElementValue(element, "BanknoteBuying")));

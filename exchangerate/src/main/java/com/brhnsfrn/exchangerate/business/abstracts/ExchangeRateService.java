@@ -9,6 +9,6 @@ import com.brhnsfrn.exchangerate.entities.dtos.ExchangeRateDto;
 
 public interface ExchangeRateService {
 	DataResult<List<ExchangeRateDto>> getAll();
-	ExchangeRateDto getByCurrencyCode(String code);
+	DataResult<ExchangeRateDto> getByCurrencyCode(String code);
 	CalculatorResultDto calculate(String code, BigDecimal unit);
 }
