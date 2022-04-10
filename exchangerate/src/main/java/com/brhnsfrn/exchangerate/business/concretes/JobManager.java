@@ -58,7 +58,7 @@ public class JobManager implements JobService{
 	}
 	
 	@PostConstruct
-	public void onStartup() {
+	private void onStartup() {
 		getData();
 	}
 }

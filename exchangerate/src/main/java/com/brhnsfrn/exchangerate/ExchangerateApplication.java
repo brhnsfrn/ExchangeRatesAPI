@@ -1,5 +1,9 @@
 package com.brhnsfrn.exchangerate;
 
+import java.util.TimeZone;
+
+import javax.annotation.PostConstruct;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -48,5 +52,10 @@ public class ExchangerateApplication {
 				.version("1.0")
 				.build();
 	}
+	
+	@PostConstruct
+	  public void init() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Istanbul"));
+	  }
 
 }
